@@ -1,4 +1,4 @@
-package br.com.xyinc.pontointeresse.controllers;
+package br.com.xyinc.pontointeresse.controller;
 
 import javax.transaction.Transactional;
 import javax.validation.Valid;
@@ -13,9 +13,10 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.ModelAndView;
 
-import br.com.xyinc.pontointeresse.daos.PontoInteresseDao;
-import br.com.xyinc.pontointeresse.models.Filtro;
-import br.com.xyinc.pontointeresse.models.PontoInteresse;
+import br.com.xyinc.pontointeresse.model.Filtro;
+import br.com.xyinc.pontointeresse.model.PontoInteresse;
+import br.com.xyinc.pontointeresse.repository.PontoInteresseRepository;
+import br.com.xyinc.pontointeresse.service.PontoInteresseService;
 
 @Controller
 @RequestMapping("/poi")
@@ -23,7 +24,10 @@ import br.com.xyinc.pontointeresse.models.PontoInteresse;
 public class PontoInteresseController {
 
 	@Autowired
-	private PontoInteresseDao pontoInteresseDao;
+	private PontoInteresseService pontoInteresseService;
+	
+	@Autowired
+	private PontoInteresseRepository repository;
 
 	@RequestMapping("/form")
 	public ModelAndView form(PontoInteresse pontoInteresse) {
@@ -37,7 +41,7 @@ public class PontoInteresseController {
 			return form(pontoInteresse);
 		}
 		try {
-			pontoInteresseDao.save(pontoInteresse);
+			repository.save(pontoInteresse);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -47,21 +51,21 @@ public class PontoInteresseController {
 	@RequestMapping(method = RequestMethod.GET, value = "/{id}")
 	public ModelAndView load(@PathVariable("id") Integer id) {
 		ModelAndView modelAndView = new ModelAndView("poi/form-update");
-		modelAndView.addObject("poi", pontoInteresseDao.findById(id));
+		modelAndView.addObject("poi", repository.findOne(id));
 		return modelAndView;
 	}
 
 	@RequestMapping(method = RequestMethod.GET)
 	public ModelAndView list(@RequestParam(defaultValue = "0", required = false) int page, @ModelAttribute Filtro filtro) {
 		ModelAndView modelAndView = new ModelAndView("poi/list");
-		modelAndView.addObject("listaPois", pontoInteresseDao.filtrar(filtro));
+		modelAndView.addObject("listaPois", pontoInteresseService.filtrar(filtro));
 		return modelAndView;
 	}
 
 	@RequestMapping(method = RequestMethod.GET, value = "/remove/{id}")
 	public String remove(@PathVariable("id") Integer id) {
-		PontoInteresse pontoInteresse = pontoInteresseDao.findById(id);
-		pontoInteresseDao.remove(pontoInteresse);
+		PontoInteresse pontoInteresse = repository.findOne(id);
+		repository.delete(pontoInteresse);
 		return "redirect:/poi";
 	}
 
@@ -72,7 +76,7 @@ public class PontoInteresseController {
 			return new ModelAndView("poi/form-update");
 		}
 		try {
-			pontoInteresseDao.update(pontoInteresse);
+			repository.save(pontoInteresse);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}

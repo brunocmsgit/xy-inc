@@ -1,4 +1,4 @@
-package br.com.xyinc.pontointeresse.models;
+package br.com.xyinc.pontointeresse.model;
 
 public class Filtro {
 
@@ -37,6 +37,10 @@ public class Filtro {
 
 	public void setdMax(Integer dMax) {
 		this.dMax = dMax;
+	}
+	
+	public boolean preenchido() {
+		return (getX() != null && getY() != null && getdMax() != null);
 	}
 	
 }

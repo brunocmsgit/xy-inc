@@ -1,65 +1,71 @@
 #Sistema de Ponto de Interesse.
 
 ##Instruções para Execução
-Importar o projeto no Eclipse como projeto Maven.
+Importar o projeto no Spring Tool Suite (STS) como projeto Maven.
 
-Configuração de usuário, senha e nome do Banco de Dados está disponível no arquivo **application.properties**
+Configuração de usuário, senha e nome do Banco de Dados está disponível no arquivo **application.properties** - pasta /resources
 
 Caso precise alterar a porta do Tomcat, adicionar server.port=porta, ex: server.port=9000
 
 A Url para o banco é spring.datasource.url=jdbc:mysql://localhost:3306/testezup sendo assim, criar o banco com o mesmo nome "testezup", ou alterar o nome no properties
 
-No Eclipse executar a classe Boot.java, dentro do pacote br.com.xyinc.pontointeresse, como Java Applicationp
+No STS executar a classe Boot.java, dentro do pacote br.com.xyinc.pontointeresse, como Java Application
 A tabela será gerada automaticamente.	
-Para acessar o sistema digitar no navegador localhost:8080/poi
+Para acessar o sistema (web) digitar no navegador localhost:8080/poi
 
-##Tecnologias usada
-A Estrutura base (estrutura Maven, templates e crud basico) foi gerado através do site http://setupmyproject.com/
-*Spring Boot
-*Jersey
-*JPA
+##Tecnologias usadas
+Estrutura base MVC (para a parte web - não foi pedido mas achei interesante colocar) foi gerado através do site http://setupmyproject.com/
+*Spring Boot 1.5.12
+*Spring Data JPA
 *MySql
-*Eclipse Neon
-*SoapUI
+*Spring Tools Suite 3.9.0
+*Postman/SoapUI para testar a api
 
 ##Testes
 Classe PontoInteresseTeste.java dentro do Pacote br.com.xyinc.teste
 
-##Testes HTTP
-Classe ServiceController.java dentro do Pacote br.com.xyinc.pontointeresse.controllers
+##Serviços
+Classe PontoInteresseResource.java dentro do Pacote br.com.xyinc.pontointeresse.api
 
-Utilizado o SoapUI para realizar os testes.
+Utilizado o Postman para realizar os testes e executar os serviços.
 
-Criar um novo projeto REST Url: http://localhost:8080/pontoInteresses
+Formato JSON.
 
-**GET** - Lista todos os pontos de interesses cadastrados
+**Listar todos os pontos de interesses**
+**GET** - http://localhost:8080/pontoInteresses/ -  cadastrados.
 
-**POST** - Cadastra um novo ponto de Interesse, caso alguma coordenada seja negativa, retorna exception com mensagem "Coordenada Negativa"
+**Para filtrar os pontos através das coordenadas X, Y e distância maxima**
+**POST** - http://localhost:8080/pontoInteresses/filtrar
+ 
+Exemplo:
+{
+    "x": "20",
+	"y": "10",
+	"dMax": "10"
+}
 
+**Cadastrar um novo ponto de interesse, caso alguma coordenada seja negativa ou nome nulo, retorna Erro 400 Bad Request e a mensagem correspondente.**
+**POST** - http://localhost:8080/pontoInteresses/
+
+Exemplo:
 {
    "nome": "Novo Ponto",
    "coordenadaX": 10,
    "coordenadaY": 5
 }
 
-**PUT** - Altera um ponto
+**Altera um ponto de interesse**
+**PUT** - http://localhost:8080/pontoInteresses/id
 
+Exemplo: http://localhost:8080/pontoInteresses/8 - Altera ponto de id 8, se não existir o recurso 8, retorna mensagem correspondente.
 {
-   "id": "8",
    "nome": "Ponto Alterado",
    "coordenadaX": 10,
    "coordenadaY": 5
 }
 
-**DELETE** - Apaga um ponto passando o ID
+**Remove um ponto passando o id. Se não existir o recurso 8, retorna mensagem correspondente, se removeu retorna status 200 OK.**
+**DELETE**
 
+Exemplo:
 http://localhost:8080/pontoInteresses/8
-
-
-**POST** - http://localhost:8080/pontoInteresses/filtrar Para filtrar os pontos através das coordenadas X, Y e distância Maxima
-
-{
-    "x": "20",
-	"y": "10",
-	"dMax": "10"
-}

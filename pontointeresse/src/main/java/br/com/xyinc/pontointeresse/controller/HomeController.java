@@ -1,4 +1,4 @@
-package br.com.xyinc.pontointeresse.controllers;
+package br.com.xyinc.pontointeresse.controller;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;

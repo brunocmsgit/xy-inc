@@ -2,6 +2,8 @@ package br.com.xyinc.teste;
 
 import java.util.List;
 
+import javax.validation.ConstraintViolationException;
+
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -13,9 +15,10 @@ import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.transaction.annotation.Transactional;
 
 import br.com.xyinc.pontointeresse.Boot;
-import br.com.xyinc.pontointeresse.daos.PontoInteresseDao;
-import br.com.xyinc.pontointeresse.models.Filtro;
-import br.com.xyinc.pontointeresse.models.PontoInteresse;
+import br.com.xyinc.pontointeresse.model.Filtro;
+import br.com.xyinc.pontointeresse.model.PontoInteresse;
+import br.com.xyinc.pontointeresse.repository.PontoInteresseRepository;
+import br.com.xyinc.pontointeresse.service.PontoInteresseService;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT, classes=Boot.class)
@@ -23,7 +26,10 @@ import br.com.xyinc.pontointeresse.models.PontoInteresse;
 public class PontoInteresseTeste {
 
 	@Autowired
-	private PontoInteresseDao pontoInteresseDao;
+	private PontoInteresseRepository respository;
+	
+	@Autowired
+	private PontoInteresseService pontoInteresseService;
 
 	@Test
 	@Rollback(true)
@@ -34,7 +40,7 @@ public class PontoInteresseTeste {
 		poi.setCoordenadaY(2);
 
 		try {
-			pontoInteresseDao.save(poi);
+			respository.save(poi);
 		} catch (Exception ex) {
 			Assert.fail("Não é possível salvar ponto de interesse");
 		}
@@ -42,18 +48,18 @@ public class PontoInteresseTeste {
 	
 	@Test
 	@Rollback(true)
-    public void testSalvarCoordenadaNegativa() {
+    public void testeSalvarCoordenadaNegativa() {
 		PontoInteresse poi = new PontoInteresse();
 		poi.setNome("Ponto de Interesse Coordenada Negativa");
 		poi.setCoordenadaX(-10);
 		poi.setCoordenadaY(-5);
 	
 		try {
-			pontoInteresseDao.save(poi);
+			respository.save(poi);
 		    Assert.fail("Não é possível salvar ponto de interesse com coordenada negativa");
 	    
 		} catch (Exception ex) {
-			Assert.assertTrue(ex.getMessage().equals("Coordenada Negativa"));
+			Assert.assertTrue(ex instanceof ConstraintViolationException);
 		}
     }
 	
@@ -67,7 +73,7 @@ public class PontoInteresseTeste {
 		poi.setCoordenadaX(27);
 		poi.setCoordenadaY(12);
 						
-		PontoInteresse pontoInteresseUm = pontoInteresseDao.findById(1);
+		PontoInteresse pontoInteresseUm = respository.findOne(1);
 		
 		Assert.assertTrue(poi.equals(pontoInteresseUm));
     }
@@ -77,7 +83,7 @@ public class PontoInteresseTeste {
 		
 		int numeroDePois = 7; // Baseado na quantidade do exemplo do PDF
 								
-		List<PontoInteresse> pontos = pontoInteresseDao.all();
+		List<PontoInteresse> pontos = respository.findAll();
 		
 		Assert.assertEquals(numeroDePois, pontos.size());
     }
@@ -89,7 +95,7 @@ public class PontoInteresseTeste {
 		
 		Filtro filtro = new Filtro(20, 10, 10);
 								
-		List<PontoInteresse> pontos = pontoInteresseDao.filtrar(filtro);
+		List<PontoInteresse> pontos = pontoInteresseService.filtrar(filtro);
 		
 		Assert.assertEquals(numeroDePois, pontos.size());
     }
